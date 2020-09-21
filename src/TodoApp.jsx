@@ -106,7 +106,7 @@ const TodoApp = () => {
             className="new-todo"
             placeholder="What needs to be done?"
             value={newTodo}
-            onChange={event => setNewTodo(event.target.value.trim())}
+            onChange={event => setNewTodo(event.target.value.trimLeft())}
           />
         </form>
       </header>

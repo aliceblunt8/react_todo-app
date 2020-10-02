@@ -3,14 +3,12 @@ import PropTypes from 'prop-types';
 import { TodoItem } from './TodoItem';
 
 export const TodoList = React.memo(
-  ({ items, updateTodo, removeTodo }) => (
+  ({ items }) => (
     <ul className="todo-list">
       {items.map(item => (
         <TodoItem
           key={item.id}
           todo={item}
-          updateTodo={updateTodo}
-          removeTodo={removeTodo}
         />
       ))}
     </ul>
@@ -23,6 +21,4 @@ TodoList.propTypes = {
     title: PropTypes.string.isRequired,
     completed: PropTypes.bool.isRequired,
   })).isRequired,
-  updateTodo: PropTypes.func.isRequired,
-  removeTodo: PropTypes.func.isRequired,
 };

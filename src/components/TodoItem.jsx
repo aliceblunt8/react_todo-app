@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { useDispatch } from 'react-redux';
+import { deleteTodo, updateTodo } from '../redux/store';
 
-export const TodoItem = ({ todo, removeTodo, updateTodo }) => {
+export const TodoItem = ({ todo }) => {
   const [isEditable, setEditing] = useState(false);
   const [newTitle, setTitle] = useState(todo.title);
+  const dispatch = useDispatch();
 
   const handleEditing = (event) => {
     const { key } = event;
@@ -12,7 +15,7 @@ export const TodoItem = ({ todo, removeTodo, updateTodo }) => {
     switch (key) {
       case 'Enter':
         if (newTitle) {
-          updateTodo(todo.id, newTitle);
+          dispatch(updateTodo(todo.id, newTitle));
         } else {
           setTitle(todo.title);
         }
@@ -32,7 +35,7 @@ export const TodoItem = ({ todo, removeTodo, updateTodo }) => {
 
   const handleBlur = () => {
     if (newTitle) {
-      updateTodo(todo.id, newTitle);
+      dispatch(updateTodo(todo.id, newTitle));
     } else {
       setTitle(todo.title);
     }
@@ -53,13 +56,13 @@ export const TodoItem = ({ todo, removeTodo, updateTodo }) => {
           type="checkbox"
           className="toggle"
           checked={todo.completed}
-          onChange={() => updateTodo(todo.id)}
+          onChange={() => dispatch(updateTodo(todo.id))}
         />
         <label>{todo.title}</label>
         <button
           type="button"
           className="destroy"
-          onClick={() => removeTodo(todo.id)}
+          onClick={() => dispatch(deleteTodo(todo.id))}
         />
       </div>
       {isEditable && (
@@ -83,6 +86,4 @@ TodoItem.propTypes = {
     title: PropTypes.string.isRequired,
     completed: PropTypes.bool.isRequired,
   }).isRequired,
-  updateTodo: PropTypes.func.isRequired,
-  removeTodo: PropTypes.func.isRequired,
 };

@@ -1,10 +1,15 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+/* eslint-disable max-len */
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { TodoList } from './components/TodoList';
 import { TodosFilter } from './components/TodosFilter';
 import { getfilteredTodos } from './helpers';
+import { getTodos, setTodos, addTodo, toggleTodos, clearCompleted } from './redux/store';
 
 const TodoApp = () => {
-  const [todos, setTodos] = useState([]);
+  const todos = useSelector(getTodos);
+  const dispatch = useDispatch();
+
   const [newTodo, setNewTodo] = useState('');
   const [filter, setFilter] = useState('all');
   const completedTodos = useMemo(
@@ -20,7 +25,7 @@ const TodoApp = () => {
     if (!localStorage.todos) {
       localStorage.setItem('todos', JSON.stringify([]));
     } else {
-      setTodos(JSON.parse(localStorage.getItem('todos')));
+      dispatch(setTodos(JSON.parse(localStorage.getItem('todos'))));
     }
   }, []);
 
@@ -35,65 +40,19 @@ const TodoApp = () => {
       return;
     }
 
-    setTodos([
-      ...todos,
-      {
-        id: +new Date(),
-        title: newTodo,
-        completed: false,
-      },
-    ]);
+    dispatch(addTodo({
+      id: +new Date(),
+      title: newTodo,
+      completed: false,
+    }));
 
     setNewTodo('');
-  };
-
-  const updateTodoItem = useCallback(
-    (todoId, newTitle) => {
-      setTodos(todos.map((todo) => {
-        if (todo.id !== todoId) {
-          return { ...todo };
-        }
-
-        if (newTitle) {
-          return {
-            ...todo,
-            title: newTitle,
-          };
-        }
-
-        return {
-          ...todo,
-          completed: !todo.completed,
-        };
-      }));
-    },
-    [todos],
-  );
-
-  const toogleAll = (event) => {
-    setTodos(todos.map(todo => (
-      {
-        ...todo,
-        completed: event.target.checked,
-      }
-    )));
   };
 
   const filteredTodos = useMemo(
     () => getfilteredTodos(todos, filter),
     [todos, filter],
   );
-
-  const deleteTodo = useCallback(
-    (todoId) => {
-      setTodos(todos.filter(todo => todo.id !== todoId));
-    },
-    [todos],
-  );
-
-  const clearCompleted = () => {
-    setTodos(todos.filter(todo => !todo.completed));
-  };
 
   return (
     <section className="todoapp">
@@ -119,13 +78,11 @@ const TodoApp = () => {
               id="toggle-all"
               className="toggle-all"
               checked={activeTodos === 0}
-              onChange={toogleAll}
+              onChange={event => dispatch(toggleTodos(event.target.checked))}
             />
             <label htmlFor="toggle-all">Mark all as complete</label>
             <TodoList
               items={filteredTodos}
-              updateTodo={updateTodoItem}
-              removeTodo={deleteTodo}
             />
           </section>
 
@@ -142,7 +99,7 @@ const TodoApp = () => {
               <button
                 type="button"
                 className="clear-completed"
-                onClick={clearCompleted}
+                onClick={() => dispatch(clearCompleted())}
               >
                 Clear completed
               </button>
